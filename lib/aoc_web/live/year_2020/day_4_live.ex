@@ -1,4 +1,4 @@
-defmodule AocWeb.Day4Live do
+defmodule AocWeb.Year2020.Day4Live do
   use AocWeb, :live_view
 
   @required_keys ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]

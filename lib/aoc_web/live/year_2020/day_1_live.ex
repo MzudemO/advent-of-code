@@ -1,4 +1,4 @@
-defmodule AocWeb.Day1Live do
+defmodule AocWeb.Year2020.Day1Live do
   use AocWeb, :live_view
 
   @sum_up_to 2020

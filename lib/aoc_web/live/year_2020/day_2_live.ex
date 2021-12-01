@@ -1,4 +1,4 @@
-defmodule AocWeb.Day2Live do
+defmodule AocWeb.Year2020.Day2Live do
   use AocWeb, :live_view
 
   def mount(_params, _session, socket) do

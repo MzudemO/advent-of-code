@@ -24,11 +24,17 @@ defmodule AocWeb.Router do
   scope "/2020", AocWeb do
     pipe_through :browser
 
-    live "/1", Day1Live
-    live "/2", Day2Live
-    live "/3", Day3Live
-    live "/4", Day4Live
-    live "/5", Day5Live
+    live "/1", Year2020.Day1Live
+    live "/2", Year2020.Day2Live
+    live "/3", Year2020.Day3Live
+    live "/4", Year2020.Day4Live
+    live "/5", Year2020.Day5Live
+  end
+  
+  scope "/2021", AocWeb do
+    pipe_through :browser
+    
+    live "/1", Year2021.Day1Live
   end
 
   # Other scopes may use custom stacks.
