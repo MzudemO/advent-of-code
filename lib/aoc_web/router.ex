@@ -35,6 +35,7 @@ defmodule AocWeb.Router do
     pipe_through :browser
     
     live "/1", Year2021.Day1Live
+    live "/2", Year2021.Day2Live
   end
 
   # Other scopes may use custom stacks.
