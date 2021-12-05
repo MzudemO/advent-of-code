@@ -36,6 +36,7 @@ defmodule AocWeb.Router do
     
     live "/1", Year2021.Day1Live
     live "/2", Year2021.Day2Live
+    live "/3", Year2021.Day3Live
   end
 
   # Other scopes may use custom stacks.
