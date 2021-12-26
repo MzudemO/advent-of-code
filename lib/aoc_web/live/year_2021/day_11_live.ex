@@ -35,11 +35,8 @@ defmodule AocWeb.Year2021.Day11Live do
     input = get_input()
 
     {_, count} =
-      for _ <- 1..2, reduce: {input, 0} do
+      for _ <- 1..100, reduce: {input, 0} do
         {acc, count} ->
-          IO.inspect(count)
-          IO.inspect(acc)
-
           acc =
             acc
             |> add_1()
@@ -52,7 +49,7 @@ defmodule AocWeb.Year2021.Day11Live do
   end
 
   defp flash(map) do
-    # get eligible coords for flashing (value >= 9 and not flashed)
+    # get eligible coords for flashing (value > 9 and not flashed)
 
     flash_coords = get_flash_coords(map)
 
@@ -60,7 +57,7 @@ defmodule AocWeb.Year2021.Day11Live do
   end
 
   defp get_flash_coords(map) do
-    eligible_keys = Map.keys(map) |> Enum.filter(&(&1 >= 9 and is_integer(&1)))
+    eligible_keys = Map.keys(map) |> Enum.filter(&(&1 > 9 and is_integer(&1)))
 
     eligible_keys
     |> Enum.map(&map[&1])
@@ -129,14 +126,14 @@ defmodule AocWeb.Year2021.Day11Live do
     |> Map.delete(:flashed)
   end
 
-  defp get_neighbors({x, y}) do
+  def get_neighbors({x, y}) do
     [
       {x + 1, y},
       {x + 1, y + 1},
       {x + 1, y - 1},
       {x - 1, y},
       {x - 1, y + 1},
-      {x - 1, y + 1},
+      {x - 1, y - 1},
       {x, y + 1},
       {x, y - 1}
     ]
@@ -149,12 +146,32 @@ defmodule AocWeb.Year2021.Day11Live do
   end
 
   def get_answer_2() do
-    :ok
+    input = get_input()
+
+    {_, step} =
+      for step <- 1..100_000, reduce: {input, 0} do
+        {acc, 0} ->
+          acc =
+            acc
+            |> add_1()
+            |> flash()
+
+          if acc |> Map.delete(:flashed) |> Enum.all?(fn {_k, v} -> MapSet.size(v) == 0 end) do
+            {acc, step}
+          else
+            {acc |> set_flashed_0(), 0}
+          end
+
+        {acc, step} ->
+          {acc, step}
+      end
+
+    step
   end
 
   defp get_input() do
     Application.app_dir(:aoc)
-    |> Path.join("priv/inputs/2021/day_11_test.txt")
+    |> Path.join("priv/inputs/2021/day_11.txt")
     |> File.read!()
     |> String.split("\n")
     |> Enum.map(fn line ->
@@ -166,9 +183,11 @@ defmodule AocWeb.Year2021.Day11Live do
         row
         |> Enum.with_index()
         |> Enum.reduce(acc, fn {value, col_index}, acc ->
+          node_index = {row_index, col_index}
+
           acc
-          |> Map.update(value, MapSet.new(), fn prev_value ->
-            MapSet.put(prev_value, {row_index, col_index})
+          |> Map.update(value, MapSet.new([node_index]), fn prev_value ->
+            MapSet.put(prev_value, node_index)
           end)
         end)
 
