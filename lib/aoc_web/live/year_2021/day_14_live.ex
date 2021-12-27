@@ -48,22 +48,36 @@ defmodule AocWeb.Year2021.Day14Live do
   def get_answer_2() do
     {polymer, instructions} = get_input()
 
-    final_polymer = pair_insertion(polymer, instructions, 40)
+    pairs = Map.new(instructions, fn <<i1, i2, " -> ", o>> -> {[i1, i2], o} end)
 
-    {{_, least_frequent_count}, {_, most_frequent_count}} =
-      final_polymer
-      |> String.split("", trim: true)
-      |> Enum.frequencies()
-      |> Enum.min_max_by(fn {_k, v} -> v end)
+    polymer = polymer |> String.to_charlist() |> Enum.chunk_every(2, 1, [0]) |> Enum.frequencies()
 
-    most_frequent_count - least_frequent_count
+    # adapted from José Valim
+    {{_, min}, {_, max}} =
+      for _ <- 1..40, reduce: polymer do
+        acc ->
+          Enum.reduce(acc, %{}, fn {[i1, i2] = pair, count}, acc ->
+            case pairs do
+              %{^pair => o} ->
+                acc
+                |> Map.update([i1, o], count, &(&1 + count))
+                |> Map.update([o, i2], count, &(&1 + count))
+
+              _ ->
+                Map.put(acc, pair, count)
+            end
+          end)
+      end
+      |> Enum.group_by(&hd(elem(&1, 0)), &elem(&1, 1))
+      |> Enum.map(fn {k, v} -> {k, Enum.sum(v)} end)
+      |> Enum.min_max_by(&elem(&1, 1))
+
+    max - min
   end
 
   defp pair_insertion(polymer, instructions, steps \\ 10) do
-    for step <- 1..steps, reduce: polymer do
+    for _ <- 1..steps, reduce: polymer do
       polymer ->
-        IO.puts(step)
-
         splices =
           Enum.reduce(instructions, [], fn instruction, acc ->
             [pattern, replacement] = String.split(instruction, " -> ")
